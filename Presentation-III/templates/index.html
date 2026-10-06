@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Examination Scheduling and Result Processing System</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f4f6f9;
+    color: #333;
+}
+
+.header {
+    background: #1f3c88;
+    color: white;
+    padding: 20px 30px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.header p {
+    margin-top: 6px;
+}
+
+.container {
+    display: flex;
+    min-height: calc(100vh - 85px);
+}
+
+.sidebar {
+    width: 230px;
+    background: #172b4d;
+    padding: 25px 15px;
+}
+
+.sidebar h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.sidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #1f3c88;
+}
+
+.main {
+    flex: 1;
+    padding: 30px;
+}
+
+.main h2 {
+    margin-top: 0;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    color: #666;
+    font-size: 15px;
+}
+
+.number {
+    font-size: 30px;
+    font-weight: bold;
+    color: #1f3c88;
+}
+
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #1f3c88;
+    color: white;
+    padding: 13px;
+    text-align: left;
+}
+
+td {
+    padding: 13px;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background: #f5f7fb;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #1f3c88;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button,
+.btn {
+    border: none;
+    padding: 9px 14px;
+    border-radius: 5px;
+    background: #1f3c88;
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.delete {
+    background: #c0392b;
+}
+
+.edit {
+    background: #2980b9;
+}
+
+.form-box {
+    max-width: 600px;
+}
+
+@media (max-width: 900px) {
+
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar {
+        width: 190px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<div class="header">
+
+    <h1>
+        Examination Scheduling and Result Processing System
+    </h1>
+
+    <p>
+        DBMS Mini Project | Examination Management Dashboard
+    </p>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- =====================================================
+     SIDEBAR
+====================================================== -->
+
+<div class="sidebar">
+
+    <h2>Management</h2>
+
+    <a href="/"
+       class="{% if page == 'dashboard' %}active{% endif %}">
+        Dashboard
+    </a>
+
+    <a href="/students"
+       class="{% if page == 'students' or page == 'edit_student' %}active{% endif %}">
+        Students
+    </a>
+
+    <a href="/courses"
+       class="{% if page == 'courses' %}active{% endif %}">
+        Courses
+    </a>
+
+    <a href="/examinations"
+       class="{% if page == 'examinations' or page == 'edit_examination' %}active{% endif %}">
+        Examinations
+    </a>
+
+    <a href="/faculty"
+       class="{% if page == 'faculty' %}active{% endif %}">
+        Faculty
+    </a>
+
+    <a href="/halls"
+       class="{% if page == 'halls' or page == 'edit_hall' %}active{% endif %}">
+        Exam Halls
+    </a>
+
+    <a href="/hall-allocation"
+       class="{% if page == 'hall_allocation' %}active{% endif %}">
+        Hall Allocation
+    </a>
+
+    <a href="/invigilators"
+       class="{% if page == 'invigilators' %}active{% endif %}">
+        Invigilators
+    </a>
+
+    <a href="/marks"
+       class="{% if page == 'marks' %}active{% endif %}">
+        Marks
+    </a>
+
+    <a href="/results"
+       class="{% if page == 'results' %}active{% endif %}">
+        Results
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN
+====================================================== -->
+
+<div class="main">
+
+
+<!-- =====================================================
+     DASHBOARD
+====================================================== -->
+
+{% if page == "dashboard" %}
+
+<h2>Dashboard</h2>
+
+<div class="cards">
+
+    <div class="card">
+        <h3>Total Students</h3>
+
+        <div class="number">
+            {{ students }}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Total Courses</h3>
+
+        <div class="number">
+            {{ courses }}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Total Examinations</h3>
+
+        <div class="number">
+            {{ examinations }}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Exam Halls</h3>
+
+        <div class="number">
+            {{ halls }}
+        </div>
+    </div>
+
+</div>
+
+
+<div class="section">
+
+    <h2>Examination Schedule</h2>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Exam ID</th>
+                <th>Course Name</th>
+                <th>Exam Date</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for exam in exams %}
+
+            <tr>
+                <td>{{ exam.Exam_ID }}</td>
+                <td>{{ exam.Course_Name }}</td>
+                <td>{{ exam.Exam_Date }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     STUDENTS
+====================================================== -->
+
+{% elif page == "students" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<h2>Student Management</h2>
+
+
+<div class="section">
+
+    <h3>Add Student</h3>
+
+    <form action="/students/add" method="POST">
+
+        <label>Student ID</label>
+
+        <input type="number"
+               name="student_id"
+               required>
+
+        <label>Name</label>
+
+        <input type="text"
+               name="name"
+               required>
+
+        <label>Branch</label>
+
+        <input type="text"
+               name="branch"
+               required>
+
+        <label>Semester</label>
+
+        <input type="number"
+               name="semester"
+               required>
+
+        <button type="submit">
+            Add Student
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="section">
+
+    <h3>Student Records</h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Branch</th>
+                <th>Semester</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+
+                <td>{{ row.Student_ID }}</td>
+                <td>{{ row.Name }}</td>
+                <td>{{ row.Branch }}</td>
+                <td>{{ row.Semester }}</td>
+
+                <td>
+
+                    <a class="btn edit"
+                       href="/students/edit/{{ row.Student_ID }}">
+                        Edit
+                    </a>
+
+                    <a class="btn delete"
+                       href="/students/delete/{{ row.Student_ID }}"
+                       onclick="return confirm('Are you sure you want to delete this student?');">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     EDIT STUDENT
+====================================================== -->
+
+{% elif page == "edit_student" %}
+
+<a class="back" href="/students">
+    ← Back to Students
+</a>
+
+<h2>Edit Student</h2>
+
+<div class="section form-box">
+
+    <form action="/students/update/{{ student.Student_ID }}"
+          method="POST">
+
+        <label>Student ID</label>
+
+        <input type="text"
+               value="{{ student.Student_ID }}"
+               disabled>
+
+        <label>Name</label>
+
+        <input type="text"
+               name="name"
+               value="{{ student.Name }}"
+               required>
+
+        <label>Branch</label>
+
+        <input type="text"
+               name="branch"
+               value="{{ student.Branch }}"
+               required>
+
+        <label>Semester</label>
+
+        <input type="number"
+               name="semester"
+               value="{{ student.Semester }}"
+               required>
+
+        <button type="submit">
+            Update Student
+        </button>
+
+        <a class="btn"
+           href="/students">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+
+<!-- =====================================================
+     COURSES
+====================================================== -->
+{% elif page == "courses" %}
+
+<h2>Course Management</h2>
+
+<div class="section form-box">
+    <h3>Add Course</h3>
+
+    <form action="/courses/add" method="POST">
+
+        <label>Course ID</label>
+        <input type="number"
+               name="course_id"
+               placeholder="Enter Course ID"
+               required>
+
+        <label>Course Name</label>
+        <input type="text"
+               name="course_name"
+               placeholder="Enter Course Name"
+               required>
+
+        <label>Credits</label>
+        <input type="number"
+               name="credits"
+               placeholder="Enter Credits"
+               required>
+
+        <button type="submit">Add Course</button>
+
+    </form>
+</div>
+
+
+<div class="section">
+
+    <h3>Course List</h3>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Credits</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+
+                <td>{{ row.Course_ID }}</td>
+
+                <td>{{ row.Course_Name }}</td>
+
+                <td>{{ row.Credits }}</td>
+
+                <td>
+                    <a class="btn delete"
+                       href="/courses/delete/{{ row.Course_ID }}"
+                       onclick="return confirm('Are you sure you want to delete this course?');">
+                        Delete
+                    </a>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     EXAMINATIONS
+====================================================== -->
+
+{% elif page == "examinations" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<h2>Examination Management</h2>
+
+
+<div class="section">
+
+    <h3>Add Examination</h3>
+
+    <form action="/examinations/add" method="POST">
+
+        <label>Exam ID</label>
+
+        <input type="number"
+               name="exam_id"
+               required>
+
+        <label>Course ID</label>
+
+        <input type="number"
+               name="course_id"
+               required>
+
+        <label>Exam Date</label>
+
+        <input type="date"
+               name="exam_date"
+               required>
+
+        <button type="submit">
+            Add Examination
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="section">
+
+    <h3>Examination Records</h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Exam ID</th>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Exam Date</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+
+                <td>{{ row.Exam_ID }}</td>
+                <td>{{ row.Course_ID }}</td>
+                <td>{{ row.Course_Name }}</td>
+                <td>{{ row.Exam_Date }}</td>
+
+                <td>
+
+                    <a class="btn edit"
+                       href="/examinations/edit/{{ row.Exam_ID }}">
+                        Edit
+                    </a>
+
+                    <a class="btn delete"
+                       href="/examinations/delete/{{ row.Exam_ID }}"
+                       onclick="return confirm('Are you sure you want to delete this examination?');">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     EDIT EXAMINATION
+====================================================== -->
+
+{% elif page == "edit_examination" %}
+
+<a class="back" href="/examinations">
+    ← Back to Examinations
+</a>
+
+<h2>Edit Examination</h2>
+
+<div class="section form-box">
+
+    <form action="/examinations/update/{{ exam.Exam_ID }}"
+          method="POST">
+
+        <label>Exam ID</label>
+
+        <input type="text"
+               value="{{ exam.Exam_ID }}"
+               disabled>
+
+        <label>Course ID</label>
+
+        <input type="number"
+               name="course_id"
+               value="{{ exam.Course_ID }}"
+               required>
+
+        <label>Exam Date</label>
+
+        <input type="date"
+               name="exam_date"
+               value="{{ exam.Exam_Date }}"
+               required>
+
+        <button type="submit">
+            Update Examination
+        </button>
+
+        <a class="btn"
+           href="/examinations">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+
+<!-- =====================================================
+     FACULTY
+====================================================== -->
+
+{% elif page == "faculty" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<h2>Faculty Management</h2>
+
+
+<div class="section">
+
+    <h3>Add Faculty</h3>
+
+    <form action="/faculty/add" method="POST">
+
+        <label>Faculty ID</label>
+
+        <input type="number"
+               name="faculty_id"
+               required>
+
+        <label>Faculty Name</label>
+
+        <input type="text"
+               name="faculty_name"
+               required>
+
+        <button type="submit">
+            Add Faculty
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="section">
+
+    <h3>Faculty Records</h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Faculty ID</th>
+                <th>Faculty Name</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+
+                <td>{{ row.Faculty_ID }}</td>
+                <td>{{ row.Faculty_Name }}</td>
+
+                <td>
+
+                    <a class="btn delete"
+                       href="/faculty/delete/{{ row.Faculty_ID }}"
+                       onclick="return confirm('Are you sure you want to delete this faculty member?');">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     EXAM HALLS
+====================================================== -->
+
+{% elif page == "halls" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<h2>Exam Hall Management</h2>
+
+
+<div class="section">
+
+    <h3>Add Exam Hall</h3>
+
+    <form action="/halls/add" method="POST">
+
+        <label>Hall ID</label>
+
+        <input type="number"
+               name="hall_id"
+               required>
+
+        <label>Hall Name</label>
+
+        <input type="text"
+               name="hall_name"
+               placeholder="Example: Block A - Hall 101"
+               required>
+
+        <label>Capacity</label>
+
+        <input type="number"
+               name="capacity"
+               min="1"
+               required>
+
+        <button type="submit">
+            Add Hall
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="section">
+
+    <h3>Exam Hall Records</h3>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Hall ID</th>
+                <th>Hall Name</th>
+                <th>Capacity</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+
+                <td>{{ row.Hall_ID }}</td>
+                <td>{{ row.Hall_Name }}</td>
+                <td>{{ row.Capacity }}</td>
+
+                <td>
+
+                    <a class="btn edit"
+                       href="/halls/edit/{{ row.Hall_ID }}">
+                        Edit
+                    </a>
+
+                    <a class="btn delete"
+                       href="/halls/delete/{{ row.Hall_ID }}"
+                       onclick="return confirm('Are you sure you want to delete this exam hall?');">
+                        Delete
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     EDIT EXAM HALL
+====================================================== -->
+
+{% elif page == "edit_hall" %}
+
+<a class="back" href="/halls">
+    ← Back to Exam Halls
+</a>
+
+<h2>Edit Exam Hall</h2>
+
+<div class="section form-box">
+
+    <form action="/halls/update/{{ hall.Hall_ID }}"
+          method="POST">
+
+        <label>Hall ID</label>
+
+        <input type="text"
+               value="{{ hall.Hall_ID }}"
+               disabled>
+
+        <label>Hall Name</label>
+
+        <input type="text"
+               name="hall_name"
+               value="{{ hall.Hall_Name }}"
+               required>
+
+        <label>Capacity</label>
+
+        <input type="number"
+               name="capacity"
+               value="{{ hall.Capacity }}"
+               min="1"
+               required>
+
+        <button type="submit">
+            Update Hall
+        </button>
+
+        <a class="btn"
+           href="/halls">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+
+<!-- =====================================================
+     HALL ALLOCATION
+====================================================== -->
+
+{% elif page == "hall_allocation" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<div class="section">
+
+    <h3>Allocate Hall</h3>
+
+    <form action="/hall-allocation/add"
+          method="POST">
+
+        <label>Exam ID</label>
+
+        <input type="number"
+               name="exam_id"
+               required>
+
+        <label>Hall ID</label>
+
+        <input type="number"
+               name="hall_id"
+               required>
+
+        <button type="submit">
+            Allocate Hall
+        </button>
+
+    </form>
+
+</div>
+
+
+<table>
+
+    <tr>
+        <th>Exam ID</th>
+        <th>Hall ID</th>
+        <th>Hall Name</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for row in data %}
+
+    <tr>
+
+        <td>{{ row.Exam_ID }}</td>
+
+        <td>{{ row.Hall_ID }}</td>
+
+        <td>{{ row.Hall_Name }}</td>
+
+        <td>
+            <a href="/hall-allocation/delete/{{ row.Exam_ID }}/{{ row.Hall_ID }}"
+               onclick="return confirm('Are you sure you want to delete this hall allocation?');">
+
+                <button class="delete-btn">Delete</button>
+
+            </a>
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+</table>
+<!-- =====================================================
+     INVIGILATORS
+====================================================== -->
+
+{% elif page == "invigilators" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<div class="section">
+
+    <h3>Assign Invigilator</h3>
+
+    <form action="/invigilators/add"
+          method="POST">
+
+        <label>Exam ID</label>
+
+        <input type="number"
+               name="exam_id"
+               required>
+
+        <label>Faculty ID</label>
+
+        <input type="number"
+               name="faculty_id"
+               required>
+
+        <button type="submit">
+            Assign Invigilator
+        </button>
+
+    </form>
+
+</div>
+
+
+<h2>Invigilator Assignments</h2>
+
+<div class="section">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Exam ID</th>
+                <th>Faculty ID</th>
+                <th>Faculty Name</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+                <td>{{ row.Exam_ID }}</td>
+                <td>{{ row.Faculty_ID }}</td>
+                <td>{{ row.Faculty_Name }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<!-- =====================================================
+     MARKS
+====================================================== -->
+
+{% elif page == "marks" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<div class="section">
+
+    <h3>Enter Marks</h3>
+
+    <form action="/marks/add"
+          method="POST">
+
+        <label>Marks ID</label>
+
+        <input type="number"
+               name="marks_id"
+               required>
+
+        <label>Student ID</label>
+
+        <input type="number"
+               name="student_id"
+               required>
+
+        <label>Exam ID</label>
+
+        <input type="number"
+               name="exam_id"
+               required>
+
+        <label>Marks Obtained</label>
+
+        <input type="number"
+               name="marks_obtained"
+               min="0"
+               required>
+
+        <button type="submit">
+            Add Marks
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="section">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Marks ID</th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Exam ID</th>
+                <th>Marks Obtained</th>
+                <th>Actions</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for row in data %}
+
+            <tr>
+
+                <td>{{ row.Marks_ID }}</td>
+
+                <td>{{ row.Student_ID }}</td>
+
+                <td>{{ row.Name }}</td>
+
+                <td>{{ row.Exam_ID }}</td>
+
+                <td>{{ row.Marks_Obtained }}</td>
+
+                <td>
+                    <a class="btn delete"
+                       href="/marks/delete/{{ row.Marks_ID }}"
+                       onclick="return confirm('Are you sure you want to delete these marks?');">
+                        Delete
+                    </a>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+<!-- =====================================================
+     RESULTS
+====================================================== -->
+
+{% elif page == "results" %}
+
+<a class="back" href="/">
+    ← Back to Dashboard
+</a>
+
+<div class="section">
+
+    <h3>Enter Result</h3>
+
+    <form action="/results/add"
+          method="POST">
+
+        <label>Result ID</label>
+
+        <input type="number"
+               name="result_id"
+               required>
+
+        <label>Student ID</label>
+
+        <input type="number"
+               name="student_id"
+               required>
+
+        <label>Course ID</label>
+
+        <input type="number"
+               name="course_id"
+               required>
+
+        <label>Grade</label>
+
+        <input type="text"
+               name="grade"
+               required>
+
+        <label>Status</label>
+
+        <select name="status" required>
+
+            <option value="">
+                Select Status
+            </option>
+
+            <option value="Pass">
+                Pass
+            </option>
+
+            <option value="Fail">
+                Fail
+            </option>
+
+        </select>
+
+        <button type="submit">
+            Add Result
+        </button>
+
+    </form>
+
+</div>
+<div class="section">
+    <table>
+        <thead>
+            <tr>
+                <th>Result ID</th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>Course ID</th>
+                <th>Grade</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td>{{ row.Result_ID }}</td>
+                <td>{{ row.Student_ID }}</td>
+                <td>{{ row.Name }}</td>
+                <td>{{ row.Course_ID }}</td>
+                <td>{{ row.Grade }}</td>
+                <td>{{ row.Status }}</td>
+
+                <td>
+                    <a class="btn delete"
+                       href="/results/delete/{{ row.Result_ID }}"
+                       onclick="return confirm('Are you sure you want to delete this result?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endif %}
+
+</div>
+
+</div>
+
+</body>
+
+</html>
